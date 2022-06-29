@@ -1,0 +1,61 @@
+import selenium
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+
+PATH = "C:\\Users\\lucaz\\Downloads\\chromedriver.exe"
+driver=webdriver.Chrome(PATH)
+driver.get("https://qa-homework.herokuapp.com/code")
+
+# Metodami click sa dostavam cez uvodnu stranku az k stranke s citacemi
+
+open = driver.find_element(By.CLASS_NAME, "enterButton")
+open.click()
+
+secret = driver.find_element(By.ID,'code')
+secret.send_keys('fd9d8a60-641d-415d-a950-bb4af0cacaa2')
+#Stranka generuje zakaždým iný secret code, nezačínala som skúsať,ako generovať stále aktuálny code, ktorý by som následne vložila do premennej a to do metody send_keys
+
+Robot = driver.find_element(By.ID,'isRobot')
+Robot.click()
+
+submit = driver.find_element(By.XPATH,'/html/body/div/div/form/button')
+submit.click()
+
+#Skrz metody find_element a následne get_attribute vytahujem vsetok text na stránke a ukladám do premennej text s ktorou ďalej pracujem nižššie
+text = driver.find_element(By.TAG_NAME,"body").get_attribute("innerText")
+
+#Kategórie a citáty, ktoré budem kontrolovat si ukladám do zoznamov
+categories=["Awesome quotes","Famous quotes"]
+
+quotes=["Do something unusual today. Pay a bill.","I love deadlines. I love the whooshing sound they make as they fly by.",
+        "Excellent time to become a missing person.","Beware of low-flying butterflies.","Nothing so needs reforming as other people's habits.",
+        "A classic is something that everyone wants to have read and nobody wants to read.","If your life was a horse, you'd have to shoot it.",
+        "You have taken yourself too seriously.","It's not a bug - it's an undocumented feature.","Yes there is a lot of people doing a great job out there."]
+
+# Jednoduchý assert test, ktorý vráti Error a vypíše text, v prípade, že citát alebo kategória v texte chýbajú
+for quote in quotes:
+    assert quote in text, f"Missing quote {quote}"
+
+for category in categories:
+    assert category in text, f"Missing category {category}"
+
+#Vytiahnem a pretypujem si všetky čísla z textu. Posledné číslo (index -1 ) by malo zodpovedať poslednému číslu na webe a teda Total sum. 
+# Total sum následne porovnám so sumou všetkých ostatných čísel skrz assert. Ak sa nerovnajú, assert vráti Error
+import re
+all_numbers = re.findall("\d+", text)
+
+total_sum =int(all_numbers[-1])
+score =all_numbers[:-1]
+score_int= []
+
+for n in score:
+    n = int(n)
+    score_int.append(n)
+print(score_int)
+
+assert sum(total_sum) == score_int, "Total sum is different"
+
+
+
+
